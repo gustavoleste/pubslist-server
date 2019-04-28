@@ -5,11 +5,13 @@ const userSchema = new Schema(
   {
     name: {
       type: mongoose.SchemaTypes.String,
-      required: true
+      required: true,
+      lowercase: true
     },
     email: {
       type: mongoose.SchemaTypes.String,
-      required: true
+      required: true,
+      lowercase: true
     },
     password: {
       type: mongoose.SchemaTypes.String,
@@ -25,11 +27,13 @@ const pubSchema = new Schema(
   {
     name: {
       type: mongoose.SchemaTypes.String,
-      required: true
+      required: true,
+      lowercase: true
     },
     address: {
       type: mongoose.SchemaTypes.String,
-      required: true
+      required: true,
+      lowercase: true
     },
     user: {
       type: mongoose.SchemaTypes.ObjectId,
@@ -44,16 +48,16 @@ const Pub = mongoose.model("Pub", pubSchema);
 
 const reviewSchema = new Schema(
   {
-    comment: {
+    review: {
       type: mongoose.SchemaTypes.String,
       required: true
     },
-    userID: {
+    user: {
       type: mongoose.SchemaTypes.ObjectId,
       required: true,
       ref: "User"
     },
-    pubID: {
+    pub: {
       type: mongoose.SchemaTypes.ObjectId,
       required: true,
       ref: "Pub"
