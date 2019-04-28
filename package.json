@@ -6,11 +6,15 @@
   "author": "Gustavo Leste",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "start":"nodemon -r dotenv/config src/index.js"
+  },
   "dependencies": {
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
     "express-graphql": "^0.8.0",
-    "graphql": "^14.2.1"
+    "graphql": "^14.2.1",
+    "mongoose": "^5.5.4"
   },
   "devDependencies": {
     "eslint": "^5.16.0",
