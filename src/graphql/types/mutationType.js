@@ -33,6 +33,29 @@ const MutationType = new GraphQLObjectType({
         }
       }
     },
+    editUser: {
+      type: UserType,
+      args: {
+        userID: { type: new GraphQLNonNull(GraphQLString) },
+        name: { type: GraphQLString },
+        email: { type: GraphQLString },
+        password: { type: GraphQLString }
+      },
+      resolve: async (_, args) => {
+        try {
+          if (args.password) {
+            args.password = await bcrypt.hash(args.password, 12);
+          }
+          let user = await User.findOne({ _id: args.userID });
+          delete args.userID;
+          const newUser = Object.assign(user, args);
+          await newUser.save();
+          return newUser;
+        } catch (err) {
+          throw err;
+        }
+      }
+    },
     newPub: {
       type: PubType,
       args: {
@@ -54,6 +77,25 @@ const MutationType = new GraphQLObjectType({
         }
       }
     },
+    editPub: {
+      type: PubType,
+      args: {
+        pubID: { type: new GraphQLNonNull(GraphQLString) },
+        name: { type: GraphQLString },
+        address: { type: GraphQLString }
+      },
+      resolve: async (_, args) => {
+        try {
+          const pub = await Pub.findOne({ _id: args.pubID });
+          delete args.userID;
+          const newPub = Object.assign(pub, args);
+          await newPub.save();
+          return newPub;
+        } catch (err) {
+          throw err;
+        }
+      }
+    },
     newReview: {
       type: ReviewType,
       args: {
@@ -68,6 +110,24 @@ const MutationType = new GraphQLObjectType({
             user,
             pub
           });
+          await newReview.save();
+          return newReview;
+        } catch (err) {
+          throw err;
+        }
+      }
+    },
+    editReview: {
+      type: ReviewType,
+      args: {
+        reviewID: { type: new GraphQLNonNull(GraphQLString) },
+        review: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve: async (_, args) => {
+        try {
+          const review = await Review.findOne({ _id: args.reviewID });
+          delete args.reviewID;
+          const newReview = Object.assign(review, args);
           await newReview.save();
           return newReview;
         } catch (err) {

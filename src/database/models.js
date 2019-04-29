@@ -11,7 +11,8 @@ const userSchema = new Schema(
     email: {
       type: mongoose.SchemaTypes.String,
       required: true,
-      lowercase: true
+      lowercase: true,
+      unique: true
     },
     password: {
       type: mongoose.SchemaTypes.String,
@@ -28,7 +29,8 @@ const pubSchema = new Schema(
     name: {
       type: mongoose.SchemaTypes.String,
       required: true,
-      lowercase: true
+      lowercase: true,
+      unique: true
     },
     address: {
       type: mongoose.SchemaTypes.String,
