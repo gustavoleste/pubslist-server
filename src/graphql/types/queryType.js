@@ -50,6 +50,7 @@ const QueryType = new GraphQLObjectType({
       resolve: async (_, { pubID }) => {
         try {
           const pub = await Pub.findOne({ _id: pubID }).populate("user");
+
           return pub;
         } catch (err) {
           throw err;
