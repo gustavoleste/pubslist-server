@@ -13,10 +13,13 @@
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^7.0.0",
-    "express": "^4.16.4",
-    "express-graphql": "^0.8.0",
     "graphql": "^14.2.1",
     "jsonwebtoken": "^8.5.1",
+    "kcors": "^2.2.2",
+    "koa": "^2.7.0",
+    "koa-graphql": "^0.8.0",
+    "koa-json": "^2.0.2",
+    "koa-router": "^7.4.0",
     "mongoose": "^5.5.4"
   },
   "devDependencies": {

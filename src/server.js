@@ -1,46 +1,57 @@
-const express = require("express");
-const server = express();
+const koa = require("koa");
+const cors = require("kcors");
+const json = require("koa-json");
+const Router = require("koa-router");
+const graphqlHTTP = require("koa-graphql");
 const schema = require("./graphql/schema");
-const grapqhqlHTTP = require("express-graphql");
-const cors = require("cors");
 const jwt = require("jsonwebtoken");
 
-const auth = (req, res, next) => {
+const server = new koa();
+const router = new Router();
+
+const auth = () => (ctx, next) => {
   try {
-    const header = req.get("Authorization");
+    const header = ctx.request.header.authorization;
     if (!header) {
-      req.isAuth = false;
+      ctx.state.isAuth = false;
       return next();
     }
     const token = header.split(" ")[1];
     if (!token) {
-      req.isAuth = false;
+      ctx.state.isAuth = false;
       return next();
     }
     const userID = jwt.verify(token, `${process.env.SECRET_KEY}`);
     if (!userID) {
-      req.isAuth = false;
+      ctx.state.isAuth = false;
       return next();
     }
-    req.isAuth = true;
-    req.userID = userID.id;
+    ctx.state.isAuth = true;
+    ctx.state.userID = userID.id;
     next();
   } catch (err) {
-    req.isAuth = false;
+    ctx.state.isAuth = false;
     console.log(err);
     return next();
   }
 };
 
-server.use(express.json());
-server.use(express.urlencoded({ extended: true }));
-server.use(cors());
-server.use(auth);
+const root = ctx => {
+  ctx.body = { msg: "Hello from Koa server!" };
+};
 
-server.get("/", (req, res) => {
-  res.status(200).send("Hello World!!!");
-});
+router.use(json());
+router.use(cors());
+router.use(auth());
+router.get("/", root);
+router.all(
+  "/graphql",
+  graphqlHTTP({
+    schema,
+    graphiql: true
+  })
+);
 
-server.use("/graphql", grapqhqlHTTP({ schema, graphiql: true }));
+server.use(router.routes()).use(router.allowedMethods);
 
 module.exports = server;

@@ -43,12 +43,12 @@ const MutationType = new GraphQLObjectType({
         email: { type: GraphQLString },
         password: { type: GraphQLString }
       },
-      resolve: async (_, args, req) => {
+      resolve: async (_, args, ctx) => {
         try {
-          if (!req.isAuth) {
+          if (!ctx.state.isAuth) {
             throw new Error("Not Authenticated");
           }
-          if (args.userID !== req.userID) {
+          if (args.userID !== ctx.state.userID) {
             throw new Error("Not Authorized");
           }
           if (args.password) {
@@ -73,15 +73,15 @@ const MutationType = new GraphQLObjectType({
         name: { type: new GraphQLNonNull(GraphQLString) },
         address: { type: new GraphQLNonNull(GraphQLString) }
       },
-      resolve: async (_, { name, address }, req) => {
+      resolve: async (_, { name, address }, ctx) => {
         try {
-          if (!req.isAuth) {
+          if (!ctx.state.isAuth) {
             throw new Error("Not Authenticated");
           }
           const newPub = new Pub({
             name,
             address,
-            user: req.userID
+            user: ctx.state.userID
           });
           await newPub.save();
           return newPub;
@@ -97,9 +97,9 @@ const MutationType = new GraphQLObjectType({
         name: { type: GraphQLString },
         address: { type: GraphQLString }
       },
-      resolve: async (_, args, req) => {
+      resolve: async (_, args, ctx) => {
         try {
-          if (!req.isAuth) {
+          if (!ctx.state.isAuth) {
             throw new Error("Not Authenticated");
           }
           const pub = await Pub.findOne({ _id: args.pubID }).populate("user");
@@ -124,9 +124,9 @@ const MutationType = new GraphQLObjectType({
         review: { type: new GraphQLNonNull(GraphQLString) },
         pub: { type: new GraphQLNonNull(GraphQLString) }
       },
-      resolve: async (_, { review, pub }, req) => {
+      resolve: async (_, { review, pub }, ctx) => {
         try {
-          if (!req.isAuth) {
+          if (!ctx.state.isAuth) {
             throw new Error("Not Authenticated");
           }
           const pubID = await Pub.findOne({ _id: pub }).populate("user");
@@ -135,7 +135,7 @@ const MutationType = new GraphQLObjectType({
           }
           const newReview = new Review({
             review,
-            user: req.userID,
+            user: ctx.state.userID,
             pub
           });
           await newReview.save();
@@ -151,9 +151,9 @@ const MutationType = new GraphQLObjectType({
         reviewID: { type: new GraphQLNonNull(GraphQLString) },
         review: { type: new GraphQLNonNull(GraphQLString) }
       },
-      resolve: async (_, args, req) => {
+      resolve: async (_, args, ctx) => {
         try {
-          if (!req.isAuth) {
+          if (!ctx.state.isAuth) {
             throw new Error("Not Authenticated");
           }
           const review = await Review.findOne({ _id: args.reviewID }).populate([
