@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const MongoPaging = require("mongo-cursor-pagination");
 
 const userSchema = new Schema(
   {
@@ -46,6 +47,8 @@ const pubSchema = new Schema(
   { timestamps: true }
 );
 
+pubSchema.plugin(MongoPaging.mongoosePlugin);
+
 const Pub = mongoose.model("Pub", pubSchema);
 
 const reviewSchema = new Schema(
@@ -67,6 +70,8 @@ const reviewSchema = new Schema(
   },
   { timestamps: true }
 );
+
+reviewSchema.plugin(MongoPaging.mongoosePlugin);
 
 const Review = mongoose.model("Review", reviewSchema);
 

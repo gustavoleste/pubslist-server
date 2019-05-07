@@ -8,7 +8,7 @@ const {
 const PubType = new GraphQLObjectType({
   name: "Pub",
   fields: {
-    id: { type: new GraphQLNonNull(GraphQLID) },
+    _id: { type: new GraphQLNonNull(GraphQLID) },
     name: { type: new GraphQLNonNull(GraphQLString) },
     address: { type: new GraphQLNonNull(GraphQLString) }
   }

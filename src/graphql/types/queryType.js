@@ -2,12 +2,17 @@ const {
   GraphQLList,
   GraphQLNonNull,
   GraphQLString,
-  GraphQLObjectType
+  GraphQLObjectType,
+  GraphQLInt
 } = require("graphql");
+
+const Base64 = require("js-base64").Base64;
 
 const UserType = require("./userType");
 const PubType = require("./pubType");
 const ReviewType = require("./reviewType");
+const PubListType = require("./pubsListType");
+const ReviewListType = require("./reviewListType");
 
 const { User, Pub, Review } = require("../../database/models");
 
@@ -29,13 +34,47 @@ const QueryType = new GraphQLObjectType({
       }
     },
     userReview: {
-      type: new GraphQLList(ReviewType),
+      type: ReviewListType,
       args: {
-        user: { type: new GraphQLNonNull(GraphQLString) }
+        user: { type: new GraphQLNonNull(GraphQLString) },
+        first: { type: GraphQLInt },
+        after: { type: GraphQLString }
       },
-      resolve: async (_, { user }) => {
+      resolve: async (_, { user, first, after }) => {
         try {
-          const reviews = await Review.find({ user }).populate("pub");
+          const skip = after === undefined ? 0 : Base64.decode(after);
+          const limit = first + 1 || 5;
+          const result = await Review.find({ user })
+            .skip(Number(skip))
+            .limit(limit)
+            .populate("pub");
+          const hasNext = limit === result.length;
+          if (hasNext) {
+            result.pop();
+          }
+          const reviews = {
+            edges: [],
+            pageInfo: {
+              hasNextPage: hasNext
+            }
+          };
+          if (after !== null) {
+            result.map((item, index) =>
+              reviews.edges.push({
+                cursor: Base64.encode(index + 1),
+                node: item
+              })
+            );
+          } else {
+            const skip = Number(Base64.decode(after));
+            result.map((item, index) =>
+              reviews.edges.push({
+                cursor: Base64.encode(skip + index + 1),
+                node: item
+              })
+            );
+          }
+          console.log(result);
           return reviews;
         } catch (err) {
           throw err;
@@ -57,10 +96,45 @@ const QueryType = new GraphQLObjectType({
       }
     },
     pubs: {
-      type: new GraphQLList(PubType),
-      resolve: async () => {
+      type: PubListType,
+      args: {
+        first: { type: GraphQLInt },
+        after: { type: GraphQLString }
+      },
+      resolve: async (_, { first, after }) => {
         try {
-          const pubs = await Pub.find().populate("user");
+          const skip = after === undefined ? 0 : Base64.decode(after);
+          const limit = first + 1 || 5;
+          const result = await Pub.find()
+            .skip(Number(skip))
+            .limit(limit)
+            .populate("user");
+          const hasNext = limit === result.length;
+          if (hasNext) {
+            result.pop();
+          }
+          const pubs = {
+            edges: [],
+            pageInfo: {
+              hasNextPage: hasNext
+            }
+          };
+          if (after !== null) {
+            result.map((item, index) =>
+              pubs.edges.push({
+                cursor: Base64.encode(index + 1),
+                node: item
+              })
+            );
+          } else {
+            const skip = Number(Base64.decode(after));
+            result.map((item, index) =>
+              pubs.edges.push({
+                cursor: Base64.encode(skip + index + 1),
+                node: item
+              })
+            );
+          }
           return pubs;
         } catch (err) {
           throw err;
@@ -68,13 +142,46 @@ const QueryType = new GraphQLObjectType({
       }
     },
     pubReview: {
-      type: new GraphQLList(ReviewType),
+      type: ReviewListType,
       args: {
-        pubID: { type: new GraphQLNonNull(GraphQLString) }
+        pub: { type: new GraphQLNonNull(GraphQLString) },
+        first: { type: GraphQLInt },
+        after: { type: GraphQLString }
       },
-      resolve: async (_, { pubID }) => {
+      resolve: async (_, { pub, first, after }) => {
         try {
-          const reviews = await Review.find({ pub: pubID }).populate("user");
+          const skip = after === undefined ? 0 : Base64.decode(after);
+          const limit = first + 1 || 5;
+          const result = await Review.find({ pub: pub })
+            .skip(Number(skip))
+            .limit(limit)
+            .populate("user");
+          const hasNext = limit === result.length;
+          if (hasNext) {
+            result.pop();
+          }
+          const reviews = {
+            edges: [],
+            pageInfo: {
+              hasNextPage: hasNext
+            }
+          };
+          if (after !== null) {
+            result.map((item, index) =>
+              reviews.edges.push({
+                cursor: Base64.encode(index + 1),
+                node: item
+              })
+            );
+          } else {
+            const skip = Number(Base64.decode(after));
+            result.map((item, index) =>
+              reviews.edges.push({
+                cursor: Base64.encode(skip + index + 1),
+                node: item
+              })
+            );
+          }
           return reviews;
         } catch (err) {
           throw err;
